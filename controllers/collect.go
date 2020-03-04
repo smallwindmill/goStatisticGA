@@ -18,13 +18,13 @@ func (c *CollectController) GetCollect() {
 	label := c.GetString("_cl")
 	ct := c.GetString("_ct")
 	content := c.GetString("_cc")
-	beego.Info("mac=",mac)
-	beego.Info("ctg=",ctg)
-	beego.Info("action=",action)
-	beego.Info("label=",label)
-	beego.Info("ct=",ct)
+	// beego.Info("mac=",mac)
+	// beego.Info("ctg=",ctg)
+	// beego.Info("action=",action)
+	// beego.Info("label=",label)
+	// beego.Info("ct=",ct)
 	// fmt.Println("my====", ctg,action)
-	beego.Info("content=",content)
+	// beego.Info("content=",content)
 	if(ct == "pageview"){
 		models.AddPageView(mac, content)
 	}else if(action == "select board or kit"){
@@ -48,11 +48,14 @@ func (c *CollectController) GetCollect() {
 	}else if(ctg == "library"){
 		models.AddLibrary(mac, action,label)
 	}else if(ctg == "error"){
-		// fmt.Println("mySelf====", ctg,action)
+		// fmt.Println("mySelf====", ctg,action);
+		// if(action == ""){
+			fmt.Println("my error====", c.Input());
+		// }
 		models.AddErrorInfo(mac, action, label)
 	}
 
-	beego.Info(c.Ctx.Input.URI())
+	// beego.Info(c.Ctx.Input.URI())
 	c.Ctx.WriteString("collect")
 }
 
@@ -63,12 +66,12 @@ func (c *CollectController) PostCollect() {
 	label := c.Input().Get("_cl")
 	ct := c.Input().Get("_ct")
 	content := c.Input().Get("_cc")
-	beego.Info("mac=",mac)
-	beego.Info("ctg=",ctg)
-	beego.Info("action=",action)
-	beego.Info("label=",label)
-	beego.Info("ct=",ct)
-	beego.Info("content=",content)
+	// beego.Info("mac=",mac)
+	// beego.Info("ctg=",ctg)
+	// beego.Info("action=",action)
+	// beego.Info("label=",label)
+	// beego.Info("ct=",ct)
+	// beego.Info("content=",content)
 	if(ct == "pageview"){
 		models.AddPageView(mac, content)
 	}else if(action == "select board or kit"){
@@ -92,12 +95,12 @@ func (c *CollectController) PostCollect() {
 	}else if(ctg == "library"){
 		models.AddLibrary(mac, action,label)
 	}else if(action == "error"){
-		fmt.Println("my====", ctg,action)
+		fmt.Println("my error====", c.Input());
 		models.AddErrorInfo(mac, action, label)
 	}
 
-	beego.Info(c.Ctx.Input.URI())
-	c.Ctx.WriteString("collect")
+	// beego.Info(c.Ctx.Input.URI())
+	c.Ctx.WriteString("collect success")
 }
 
 // func (c *CollectController) getCollectt() {

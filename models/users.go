@@ -2,7 +2,7 @@ package models
 
 import (
 	"fmt"
-	"log"
+	_ "log"
 	"time"
 	"errors"
 	"encoding/json"
@@ -54,19 +54,16 @@ func AddFeedBack(mac string, created time.Time, feedBackMsg string, email string
 func GetFeedBacks(createdStartTime time.Time, createdEndTime time.Time, offset int, limit int) string{
 	result := []FeedBack{}
 	db.Debug().Model(&FeedBack{}).Where("created_at BETWEEN ? AND ?", createdStartTime, createdEndTime).Find(&result)
-	log.Println(result)
+	// log.Println(result)
 	data,_ := json.Marshal(result)
 	return string(data)
 
 }
 
-func Add(x,y int) int {
-	return x+y
-}
-
 func init() {
-	db, err = gorm.Open("mysql", "root:123456.@/statistic?charset=utf8mb4&parseTime=True&loc=Local")
-	// db, err = gorm.Open("mysql", "root:hidfrobot@/statistic?charset=utf8mb4&parseTime=True&loc=Local")
+	return
+	// db, err = gorm.Open("mysql", "root:123456.@/statistic?charset=utf8mb4&parseTime=True&loc=Local")
+	db, err = gorm.Open("mysql", "root:hidfrobot@/statistic?charset=utf8mb4&parseTime=True&loc=Local")
 	db.Debug().AutoMigrate(&User{},&FeedBack{})
 	db.Debug().AutoMigrate(&CollectLibrary{},&CollectSetting{},&CollectJumpOuter{},
 		&CollectScreen{},&CollectCodeLanguage{}, &CollectCodeMode{},&CollectProduct{},&CollectModule{},&CollectPageview{})
@@ -80,7 +77,7 @@ func AddUser(mac string , city string , ip string, version string,startuptime in
 
 	//db.Debug().Where("mac=?", mac).Preload("Cities").Find(&user)
 	db.Debug().Where("mac=?", mac).Find(&user)
-	log.Println(user)
+	// log.Println(user)
 	if user.ID == 0{
 		user.CreatedAt = createdTime
 		user.UpdatedAt = updatedTime
@@ -90,7 +87,7 @@ func AddUser(mac string , city string , ip string, version string,startuptime in
 		user.Startup = startuptime
 		//user.Cities = []City{{CityName:city}}
 		user.Ip = ip
-		log.Println("insert into")
+		// log.Println("insert into")
 		db.Create(&user)
 	}else{
 		// exist := false
@@ -108,7 +105,7 @@ func AddUser(mac string , city string , ip string, version string,startuptime in
 		//}
 		db.Save(&user)
 	}
-	log.Println(user)
+	// log.Println(user)
 }
 
 func GetUser(mac string) string{
@@ -138,7 +135,7 @@ func GetUsers(visitsMin int, visitsMax int, updatedStartTime time.Time, updatedE
             }
         }
     }*/
-	log.Println(users)
+	// log.Println(users)
 	data,_ := json.Marshal(users)
 	return string(data)
 }
@@ -162,7 +159,7 @@ func GetUserStatistic(visitsMin int, visitsMax int, updatedStartTime time.Time, 
 		total += v.Total
 	}
 	result.Total = total
-	log.Println(result)
+	// log.Println(result)
 	data,_ := json.Marshal(result)
 	return string(data)
 }
@@ -175,7 +172,7 @@ func GetFeedBackStatistic(createdStartTime time.Time, createdEndTime time.Time) 
 	result := FeedBackStatistic{}
 
 	db.Debug().Model(&FeedBack{}).Where("created_at BETWEEN ? AND ?", createdStartTime, createdEndTime).Select("count(*) as total").Scan(&result)
-	log.Println(result)
+	// log.Println(result)
 	data,_ := json.Marshal(result)
 	return string(data)
 }

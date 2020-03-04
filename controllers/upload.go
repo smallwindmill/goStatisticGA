@@ -20,6 +20,7 @@ func (c *UploadController) Post() {
 	var email string
 	var mac string
 	var attachmentPath string
+	var feedBackUrl string
 	var dir string
 	beego.Debug("input=",c.Input())
 
@@ -35,7 +36,7 @@ func (c *UploadController) Post() {
 	if v := c.Input().Get("mac");v != ""{
 		mac = v
 		// dir = "./files/"+strings.Replace(mac, ":", "-", -1 )+"/" //window测试地址
-		// attachmentPath = "./files/"+strings.Replace(mac, ":", "-", -1 )+"/" //window测试地址
+		// attachmentPath = "./files/"+strings.Replace(mac, ":", "-", -1 )+"/"
 		dir = "/home/dfrobot/attachment/lib/files/"+strings.Replace(mac, ":", "-", -1 )+"/"
 		attachmentPath = "/home/dfrobot/attachment/lib/files/"+strings.Replace(mac, ":", "-", -1 )+"/"
 		os.MkdirAll(dir, os.ModePerm)
@@ -44,6 +45,7 @@ func (c *UploadController) Post() {
 		return
 	}
 	attachment := ""
+
 	if(c.Ctx.Request.MultipartForm != nil){
 		files := c.Ctx.Request.MultipartForm.File
 		for k,v := range files{
@@ -67,8 +69,13 @@ func (c *UploadController) Post() {
 			}
 		}
 	}
-	models.AddFeedBack(mac,time.Now(),feedBackMsg,email,attachment)
-	models.SendMailInit(email, feedBackMsg, attachment) //将用户信息以邮件发送至项目组邮箱
+  feedBackUrl = strings.Replace(attachment, "/home/dfrobot/attachment/", "", -1 ) //前端读取文件路径
+	models.AddFeedBack(mac,time.Now(),feedBackMsg,email,feedBackUrl)
+
+	// if (attachment != "") {
+		fmt.Println("attachment====", attachment);
+		models.SendMailInit(email, feedBackMsg, attachment) //将用户信息以邮件发送至项目组邮箱
+	// }
 	//file, header, e := c.GetFile("fileUpload0")
 	//file.Close()
 	//file, header, e := c.FormFile("fileUpload1")

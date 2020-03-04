@@ -25,6 +25,7 @@ type SendMail struct {
     host     string
     port     string
     auth     smtp.Auth
+    // file_arr []string
 }
 
 type Attachment struct {
@@ -49,9 +50,14 @@ type Message struct {
 func SendMailInit(Email_addr string, feedBackMsg string, filePath string) {
     var mail Mail
     // feedBackMsg = mail.feebBackMsg
-    mail = &SendMail{user: "18508105904@163.com", password: "H237854", host: "smtp.163.com", port: "25"}
+    // mail = &SendMail{user: "18508105904@163.com", password: "H237854", host: "smtp.163.com", port: "25"}
+    // 阿里云屏蔽163的25端口,所以使用qq邮箱
+    // mail = &SendMail{user: "18508105904@163.com", password: "H237854", host: "ssl://smtp.163.com", port: "465"}
+    mail = &SendMail{user: "1803405349@qq.com", password: "rqlxmwngarcqifhg", host: "smtp.qq.com", port: "587"}
+    // fmt.Println('atts=====', atts);
     message := Message{
-        from: "18508105904@163.com",
+        from: "1803405349@qq.com",
+        // to: []string{"18508105904@163.com"},
         to: []string{"1803405349@qq.com"},
         // to: []string{"mindplus@dfrobot.com"},
         from_user: "Mind+用户反馈",
@@ -85,6 +91,7 @@ func SendMailInit(Email_addr string, feedBackMsg string, filePath string) {
 func (mail *SendMail) Auth() {
     mail.auth = smtp.PlainAuth("", mail.user, mail.password, mail.host) //获取邮箱验证
 
+
 }
 
 func (mail SendMail) Send(message Message) error {
@@ -108,8 +115,8 @@ func (mail SendMail) Send(message Message) error {
     buffer.WriteString(body)
 
 
-    fmt.Println("send mail2222", smtp.SendMail);
-    if message.attachment.withFile {
+    fmt.Println("start send mail2222", smtp.SendMail);
+    /*if message.attachment.withFile {
         attachment := "\r\n--" + boundary + "\r\n"
         attachment += "Content-Transfer-Encoding:base64\r\n"
         attachment += "Content-Disposition:attachment\r\n"
@@ -120,12 +127,36 @@ func (mail SendMail) Send(message Message) error {
                 log.Fatalln(err)
             }
         }()
-        mail.writeFile(buffer, message.attachment.name)
+
+        file_arr := strings.Split(message.attachment.name, ",")
+        for key, value := range file_arr {
+            fmt.Println(file_arr[key])
+            mail.writeFile(buffer, value)
+        }
+    }
+*/
+    // 多附件
+    if message.attachment.withFile {
+        attachment := "\r\n--" + boundary + "\r\n"
+        file_arr := strings.Split(message.attachment.name, ",")
+        attachment += "Content-Transfer-Encoding:base64\r\n"
+        attachment += "Content-Disposition:attachment\r\n"
+        for key, value := range file_arr {
+            attachment += "Content-Type:" + message.attachment.contentType + ";name=\"" + value + "\"\r\n"
+            buffer.WriteString(attachment)
+            defer func() {
+                if err := recover(); err != nil {
+                    log.Fatalln(err)
+                }
+            }()
+            fmt.Println(file_arr[key])
+            mail.writeFile(buffer, value)
+        }
     }
 
     buffer.WriteString("\r\n--" + boundary + "--")
-    smtp.SendMail(mail.host+":"+mail.port, mail.auth, message.from, message.to, buffer.Bytes())//linux下不执行本段代码
-    fmt.Println("***send mail success", smtp.SendMail(mail.host+":"+mail.port, mail.auth, message.from, message.to, buffer.Bytes()))
+    smtp.SendMail(mail.host+":"+mail.port, mail.auth, message.from, message.to, buffer.Bytes())
+    fmt.Println("***send mail success")
     return nil
 }
 
